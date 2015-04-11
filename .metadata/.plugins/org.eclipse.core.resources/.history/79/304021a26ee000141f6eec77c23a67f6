@@ -1,0 +1,51 @@
+import java.util.ArrayList;
+
+
+public class Node {
+	
+	ArrayList<Node> children;
+	ArrayList<Node> parents;
+	ArrayList<Double> probTable;
+	String ID;
+	boolean state;
+	
+	public Node(String ID, ArrayList<Node> children, ArrayList<Node> parents, ArrayList<Double> probTable ){
+		this.ID = ID;
+		this.children = children;
+		this.parents = parents;
+		this.probTable = probTable;
+	}
+	
+	void setState(boolean state){
+		this.state = state;
+	}
+	
+	void printChildren(){
+		System.out.println("Children:");
+		System.out.println(children);
+	}
+	
+	void printParents(){
+		System.out.println("Parents:");
+		System.out.println(parents);
+	}
+	
+	void printTable(){
+		System.out.println("Prob Table:");
+		System.out.println(probTable);
+	}
+	
+	double lookUpProbability(){
+		int index = (this.state) ? 1 : 0;
+		for(Node parent : parents){
+			if(parent.state){
+				int loc = parents.indexOf(parent);
+				index += Math.pow(2, loc);
+			}
+		}
+		
+		
+		return this.probTable.get(index);
+	}
+	
+}

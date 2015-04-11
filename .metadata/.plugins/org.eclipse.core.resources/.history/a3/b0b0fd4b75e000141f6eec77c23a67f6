@@ -1,0 +1,25 @@
+import java.util.ArrayList;
+import java.util.Random;
+
+
+public class BayesNet {
+	ArrayList<Node> network;
+	
+	BayesNet(ArrayList<Node> network){
+		this.network = network;
+	}
+	
+	
+	double queryNetwork(Node sample, ArrayList<Node> evidence, int itrs, int samples){
+		Random rnd = new Random();
+		
+		for(Node node: network){
+			if(evidence.indexOf(node) == -1){
+				node.setState(rnd.nextBoolean());
+			}
+		}
+		
+		return 1.0;
+	}
+	
+}

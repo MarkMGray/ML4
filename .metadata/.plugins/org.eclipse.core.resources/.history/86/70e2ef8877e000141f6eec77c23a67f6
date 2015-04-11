@@ -1,0 +1,60 @@
+import java.util.ArrayList;
+import java.util.Random;
+
+
+public class BayesNet {
+	ArrayList<Node> network;
+	Random rnd = new Random();
+	
+	BayesNet(ArrayList<Node> network){
+		this.network = network;
+	}
+	
+	Node getRandomNotInEvidence(ArrayList<Node> evidence){
+		
+		int randomIndex = rnd.nextInt(network.size());
+		Node retNode = network.get(randomIndex);
+		while(evidence.indexOf(retNode) != -1){
+			randomIndex = rnd.nextInt(network.size());
+			retNode = network.get(randomIndex);
+		}
+		
+		return retNode;
+	}
+	
+	double queryNetwork(Node sample, ArrayList<Node> evidence, int itrs, int samples){
+		
+		Node randomNode = getRandomNotInEvidence(evidence);
+		
+		// Randomly initialize the network without changing evidence
+		for(Node node: network){
+			if(evidence.indexOf(node) == -1){
+				node.setState(rnd.nextBoolean());
+			}else{
+				System.out.println("It is in evidence");
+			}
+		}
+		
+		for(int i = 0; i < samples; i++)
+		{
+			for(int j = 0; j < itrs; j++){
+				
+				double prob = randomNode.getConditionalProb();
+				if(rnd.nextDouble() < prob)
+				{
+					randomNode.setState(true);
+				}else{
+					randomNode.setState(false);
+				}
+				
+			}
+		}
+		
+		
+		
+		
+		
+		return 1.0;
+	}
+	
+}

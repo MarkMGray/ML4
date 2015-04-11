@@ -1,0 +1,82 @@
+import java.util.ArrayList;
+
+
+public class Node {
+	
+	ArrayList<Node> children = ArrayList<Node>();
+	ArrayList<Node> parents = ArrayList<Node>();
+	ArrayList<Double> probTable = ArrayList<Double>();
+	String ID;
+	int nodePos;
+	boolean state;
+	
+	public Node(String ID, ArrayList<Node> parents, ArrayList<Double> probTable, int nodePos){
+		this.ID = ID;
+		this.parents = parents;
+		this.probTable = probTable;
+		this.state = true;
+		this.nodePos = nodePos;
+		
+		for(Node parent : this.parents){
+			if(parent.children == null)
+				parent.children = new ArrayList<Node>();
+			
+			parent.children.add(this);
+		}
+	}
+	
+	void setState(boolean state){
+		this.state = state;
+	}
+	
+	void printChildren(){
+		System.out.println("Children:");
+		System.out.println(children);
+	}
+	
+	void printParents(){
+		System.out.println("Parents:");
+		System.out.println(parents);
+	}
+	
+	void printTable(){
+		System.out.println("Prob Table:");
+		System.out.println(probTable);
+	}
+	
+	double lookUpProbability(){
+		int index = (this.state) ? 1 : 0;
+		for(Node parent : parents){
+			if(parent.state){
+				int loc = parents.indexOf(parent);
+				index += Math.pow(2, loc+1);
+			}
+		}
+		System.out.println(index);
+		return this.probTable.get(index);
+	}
+	
+	boolean getState(){
+		return this.state;
+	}
+	
+	double getConditionalProb(){
+		boolean currState = this.state;
+		this.state = true;
+		double numer = this.lookUpProbability();
+		for(Node child: this.children){
+			numer *= child.lookUpProbability();
+		}
+		
+		this.state = false;
+		double denom = this.lookUpProbability();
+		for(Node child: this.children){
+			denom *= child.lookUpProbability();
+		}
+		
+		this.state = currState;
+		
+		return numer / (numer + denom);
+	}
+	
+}

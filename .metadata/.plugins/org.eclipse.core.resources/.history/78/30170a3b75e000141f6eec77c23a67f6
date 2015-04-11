@@ -1,0 +1,19 @@
+import java.util.ArrayList;
+
+
+public class BayesNet {
+	ArrayList<Node> network;
+	
+	BayesNet(ArrayList<Node> network){
+		this.network = network;
+	}
+	
+	
+	double queryNetwork(Node sample, ArrayList<Node> evidence, int itrs, int samples){
+		
+		
+		
+		return 1.0;
+	}
+	
+}
