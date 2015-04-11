@@ -35,7 +35,12 @@ public class Node {
 	
 	void printChildren(){
 		System.out.println("Children:");
-		System.out.println(children);
+		System.out.print("[");
+		for(Node child : children){
+			System.out.print(" " + child.ID );
+		}
+		System.out.print("]");
+		System.out.println("");
 	}
 	
 	void printParents(){

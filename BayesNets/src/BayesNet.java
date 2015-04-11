@@ -34,19 +34,6 @@ public class BayesNet {
 		return true;
 	}
 	
-	boolean sampleCorrectGivenEvidenceAtPos(ArrayList<Node> evidence, int sample, int pos){
-		for(Node node : evidence){
-			if(node.nodePos == pos){
-				
-				int evidenceState = (node.getState()) ? 1 : 0;
-				if(sample != evidenceState){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
 	double queryNetworkRejection(ArrayList<Node> sample, ArrayList<Node> evidence, int samples){
 		
 		int[][] sampleList = new int[samples][network.size()];
@@ -55,31 +42,61 @@ public class BayesNet {
 		for(int i = 0; i < sample.size(); i++){
 			startStates.add(sample.get(i).getState());
 		}
+		ArrayList<Boolean> evidenceStates = new ArrayList<Boolean>();
+		for(int i = 0; i < evidence.size(); i++){
+			evidenceStates.add(evidence.get(i).getState());
+		}
 		
+		int rejected =0;
 outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
+			int[] currSample = new int[network.size()];
+			
+			for(int k = 0; k < network.size(); k++){
+				currSample[k] = (network.get(k).getState()) ? 1 : 0;
+			}
 			
 			for(int j = 0; j < network.size(); j++){
+				network.get(j).setState(true);
 				double prob = network.get(j).getConditionalProb();
 				int toState = 0;
 				
 				if(rnd.nextDouble() < prob){
 					toState = 1;
 				}
-				
 				network.get(j).setState(toState);
+				boolean accept = true;
+				for(int x = 0; x < evidence.size(); x++){
+					
+				}
+				//boolean accept = sampleCorrectGivenEvidence(evidence, checkSample);
+				
 			}
-			int[] tempSample = new int[network.size()];
+			int[] checkSample = new int[network.size()];
 			for(int k = 0; k < network.size(); k++){
-				tempSample[k] = (network.get(k).getState()) ? 1 : 0;
+				checkSample[k] = (network.get(k).getState()) ? 1 : 0;
 			}
-			boolean accept = sampleCorrectGivenEvidence(evidence, tempSample);
+			for(int k = 0; k < evidence.size(); k++){
+				int pos = evidence.get(k).nodePos - 1;
+				network.get(pos).setState(currSample[pos]);
+			}
+			boolean accept = sampleCorrectGivenEvidence(evidence, checkSample);
 			if(accept){
+				System.out.print("Accept = [");
 				for(int k = 0; k < network.size(); k++){
-					sampleList[sampleCounter][k] = (network.get(k).getState()) ? 1 : 0 ;
+					System.out.print( " " + checkSample[k]);
+				}
+				System.out.print("]");
+				System.out.println();
+				for(int k = 0; k < network.size(); k++){
+					sampleList[sampleCounter][k] = checkSample[k];
 				}
 				sampleCounter++;
+			}else{
+				rejected++;
 			}
 		}
+		
+		System.out.println("Rejected: "+ rejected);
 		
 		double denom = 0;
 		double numer = 0;
@@ -94,10 +111,6 @@ outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
 				}
 			}
 		}
-		
-		System.out.println("Numer: " + numer);
-		System.out.println("Denom: " + denom);
-		System.out.println("Total: " + sampleCounter);
 		
 		return numer / denom;
 	}
@@ -149,10 +162,6 @@ outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
 				}
 			}
 		}
-		
-		
-		
-		
 		return numer/ denom;
 	}
 	
