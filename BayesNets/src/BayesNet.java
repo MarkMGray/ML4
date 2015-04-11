@@ -34,16 +34,85 @@ public class BayesNet {
 		return true;
 	}
 	
-	double queryNetwork(Node sample, ArrayList<Node> evidence, int itrs, int samples){
+	boolean sampleCorrectGivenEvidenceAtPos(ArrayList<Node> evidence, int sample, int pos){
+		for(Node node : evidence){
+			if(node.nodePos == pos){
+				
+				int evidenceState = (node.getState()) ? 1 : 0;
+				if(sample != evidenceState){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	double queryNetworkRejection(ArrayList<Node> sample, ArrayList<Node> evidence, int samples){
+		
+		int[][] sampleList = new int[samples][network.size()];
+		int sampleCounter = 0;
+		ArrayList<Boolean> startStates = new ArrayList<Boolean>();
+		for(int i = 0; i < sample.size(); i++){
+			startStates.add(sample.get(i).getState());
+		}
+		
+outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
+			
+			for(int j = 0; j < network.size(); j++){
+				double prob = network.get(j).getConditionalProb();
+				int toState = 0;
+				
+				if(rnd.nextDouble() < prob){
+					toState = 1;
+				}
+				
+				network.get(j).setState(toState);
+			}
+			int[] tempSample = new int[network.size()];
+			for(int k = 0; k < network.size(); k++){
+				tempSample[k] = (network.get(k).getState()) ? 1 : 0;
+			}
+			boolean accept = sampleCorrectGivenEvidence(evidence, tempSample);
+			if(accept){
+				for(int k = 0; k < network.size(); k++){
+					sampleList[sampleCounter][k] = (network.get(k).getState()) ? 1 : 0 ;
+				}
+				sampleCounter++;
+			}
+		}
+		
+		double denom = 0;
+		double numer = 0;
+		for(int i = 0; i < sample.size(); i++){
+			sample.get(i).setState(startStates.get(i));
+		}
+		for(int i = 0; i < samples; i++){
+			if(sampleCorrectGivenEvidence(evidence, sampleList[i])){
+				denom++;
+				if(sampleCorrectGivenEvidence(sample, sampleList[i])){
+					numer++;
+				}
+			}
+		}
+		
+		System.out.println("Numer: " + numer);
+		System.out.println("Denom: " + denom);
+		System.out.println("Total: " + sampleCounter);
+		
+		return numer / denom;
+	}
+	
+	double queryNetworkGibs(ArrayList<Node> sample, ArrayList<Node> evidence, int itrs, int samples){
 		
 		Node randomNode = getRandomNotInEvidence(evidence);
-		boolean startState = sample.getState();
+		ArrayList<Boolean> startStates = new ArrayList<Boolean>();
+		for(int i = 0; i < sample.size(); i++){
+			startStates.add(sample.get(i).getState());
+		}
 		// Randomly initialize the network without changing evidence
 		for(Node node: network){
 			if(evidence.indexOf(node) == -1){
 				node.setState(rnd.nextBoolean());
-			}else{
-				System.out.println("It is in evidence");
 			}
 		}
 		int[][] sampleList = new int[samples][network.size()];
@@ -68,19 +137,17 @@ public class BayesNet {
 		
 		double numer = 0;
 		double denom = 0;
-		sample.setState(startState);
+		//sample.setState(startState);
+		for(int i = 0; i < sample.size(); i++){
+			sample.get(i).setState(startStates.get(i));
+		}
 		for(int i = 0; i < samples; i++){
 			if(sampleCorrectGivenEvidence(evidence, sampleList[i])){
 				denom++;
-				if(sampleCorrectGivenEvidence(new ArrayList<Node>(Arrays.asList(sample)), sampleList[i])){
+				if(sampleCorrectGivenEvidence(sample, sampleList[i])){
 					numer++;
 				}
 			}
-			for(int j = 0; j < network.size(); j++)
-			{
-				System.out.print(" " + sampleList[i][j] + " ");
-			}
-			System.out.println("");
 		}
 		
 		

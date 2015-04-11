@@ -1,17 +1,13 @@
-INDEX VERSION 1.126+C:\Users\Owner\Desktop\ML4\.metadata\.plugins\org.eclipse.jdt.core
-3256372620.index
-739078005.index
-384216248.index
-3015671029.index
-1075156909.index
-728132027.index
-1820024274.index
-2226433707.index
-3626931047.index
-3521617142.index
-683184654.index
-1144188029.index
-4149142647.index
-4018706093.index
-2706502329.index
-2708239607.index
+INDEX VERSION 1.127+/v/filer4b/v20q001/mmg3339/Documents/Machine_Learning/hw4/ML4/.metadata/.plugins/org.eclipse.jdt.core
+1737441395.index
+1198206356.index
+1714592054.index
+1514218975.index
+1022003584.index
+664202523.index
+1989682271.index
+3829351191.index
+1928036885.index
+2580189232.index
+2409005450.index
+1791498496.index

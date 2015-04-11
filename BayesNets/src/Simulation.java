@@ -18,11 +18,17 @@ public class Simulation {
 		
 		BayesNet bayes = new BayesNet(bayesNet);
 		
-		
 		n3.setState(true);
-		double res = bayes.queryNetwork(n2, new ArrayList<Node>(Arrays.asList(n3)), 100, 100);
+		n2.setState(false);
+		n4.setState(true);
+		double resGibs = bayes.queryNetworkGibs(new ArrayList<Node>(Arrays.asList(n2)), new ArrayList<Node>(Arrays.asList(n3)), 100, 1000);
 		
-		System.out.println("Result: " + res);
+		n2.setState(false);
+		n3.setState(true);
+		n4.setState(true);
+		double resRejection = bayes.queryNetworkRejection(new ArrayList<Node>(Arrays.asList(n2)), new ArrayList<Node>(Arrays.asList(n3)), 10000);
+		System.out.println("Result Gibs: " + resGibs);
+		System.out.println("Result Rejection: " + resRejection);
 		
 		
 		

@@ -29,6 +29,10 @@ public class Node {
 		this.state = state;
 	}
 	
+	void setState(int state){
+		this.state = (state > 0) ? true : false;
+	}
+	
 	void printChildren(){
 		System.out.println("Children:");
 		System.out.println(children);
