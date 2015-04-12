@@ -1,0 +1,10 @@
+Use ECLIPSE and set the workspace as this directory.
+
+Simply use the run button at the top of ECLIPSE to run my code.
+
+Graphs were created by outputing information from here and putting
+them into MATLAB. 
+
+Node contains general information about a single node in the network
+BayesNet holds all nodes and performs GIBBS and REJECTION sampling
+Simulation runs both of these together.

@@ -30,32 +30,64 @@ public class Simulation {
 		ArrayList<Node> bayesNet = new ArrayList<Node>(Arrays.asList(n1,n2,n3,n4,n5, n6, n7, n8, n9, n10));
 		
 		BayesNet bayes = new BayesNet(bayesNet);
-		
-		for(int i = 0; i < bayesNet.size(); i++){
-			System.out.println("Cond Prob " + bayesNet.get(i).ID + ":" + bayesNet.get(i).getConditionalProb());
-			bayesNet.get(i).printChildren();
-		}
-		
-		long startTime = System.nanoTime();
-		double resGibs = bayes.queryNetworkGibs(new ArrayList<Node>(Arrays.asList(n2)), new ArrayList<Node>(Arrays.asList(n3, n5)), 100, 1000);
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println("Gibs running time nano: " + duration);
-		System.out.println("Gibs running time milli: " + duration / 1000000);
-		
-		for(int i = 0; i < bayesNet.size(); i++)
+		double averageRunningGibbs = 0;
+		double averageRunningReject = 0;
+		ArrayList<Double> gibbs = new ArrayList<Double>();
+		ArrayList<Double> rej = new ArrayList<Double>();
+		for(int z = 0; z < 1000; z++)
 		{
-			bayesNet.get(i).setState(true);
+			
+			n3.setState(false);
+			n4.setState(true);
+			n5.setState(true);
+			n7.setState(false);
+			long startTime = System.nanoTime();
+			double resGibs = bayes.queryNetworkGibs(new ArrayList<Node>(Arrays.asList(n7)), new ArrayList<Node>(Arrays.asList(n3,n4,n5)), 100, 1000);
+			long endTime = System.nanoTime();
+			long duration = (endTime - startTime);
+			System.out.println("Gibs running time nano: " + duration);
+			System.out.println("Gibs running time milli: " + duration / 1000000);
+			averageRunningGibbs += duration/ 1000000;
+			for(int i = 0; i < bayesNet.size(); i++)
+			{
+				bayesNet.get(i).setState(true);
+			}
+			startTime = System.nanoTime();
+			
+			n3.setState(false);
+			n4.setState(true);
+			n5.setState(true);
+			n7.setState(false);
+			double resRejection = bayes.queryNetworkRejection(new ArrayList<Node>(Arrays.asList(n7)), new ArrayList<Node>(Arrays.asList(n3,n4,n5)), 1000);
+			endTime = System.nanoTime();
+			duration = (endTime - startTime);
+			System.out.println("Rejection running time nano: " + duration);
+			System.out.println("Rejection running time milli: " + duration / 1000000);
+			System.out.println("Result Gibs: " + resGibs);
+			System.out.println("Result Rejection: " + resRejection);
+			gibbs.add(resGibs);
+			rej.add(resRejection);
+			averageRunningReject += duration/ 1000000;
 		}
-		startTime = System.nanoTime();
-		double resRejection = bayes.queryNetworkRejection(new ArrayList<Node>(Arrays.asList(n2)), new ArrayList<Node>(Arrays.asList(n3, n5)), 1000);
-		endTime = System.nanoTime();
-		duration = (endTime - startTime);
-		System.out.println("Rejection running time nano: " + duration);
-		System.out.println("Rejection running time milli: " + duration / 1000000);
-		System.out.println("Result Gibs: " + resGibs);
-		System.out.println("Result Rejection: " + resRejection);
 		
+		System.out.println("Average Gibbs: " + averageRunningGibbs/10);
+		System.out.println("Average Reject: " + averageRunningReject/10);
+		
+		System.out.print("gibs=[");
+		for(int i = 0; i < gibbs.size(); i++){
+			System.out.print(" " + gibbs.get(i));
+			if(i != gibbs.size()-1)
+				System.out.print(",");
+		}
+		System.out.print("];");
+		System.out.println();
+		System.out.print("rej=[");
+		for(int i = 0; i < rej.size(); i++){
+			System.out.print(" " + rej.get(i));
+			if(i != rej.size()-1)
+				System.out.print(",");
+		}
+		System.out.print("];");
 		
 		
 		

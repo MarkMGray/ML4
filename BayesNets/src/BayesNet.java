@@ -55,6 +55,7 @@ outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
 				currSample[k] = (network.get(k).getState()) ? 1 : 0;
 			}
 			
+			boolean accept = true;
 			for(int j = 0; j < network.size(); j++){
 				network.get(j).setState(true);
 				double prob = network.get(j).getConditionalProb();
@@ -64,39 +65,31 @@ outer:	 while(sampleCounter < samples){ //for(int i = 0; i < samples; i++){
 					toState = 1;
 				}
 				network.get(j).setState(toState);
-				boolean accept = true;
 				for(int x = 0; x < evidence.size(); x++){
-					
+					// get position
+					int pos = evidence.get(x).nodePos -1;
+					if(pos == j)
+					{
+						boolean state = network.get(pos).getState();
+						if(state != evidenceStates.get(x)){
+							accept = false;
+						}
+					}
 				}
-				//boolean accept = sampleCorrectGivenEvidence(evidence, checkSample);
 				
+				if(!accept)
+					break;
 			}
-			int[] checkSample = new int[network.size()];
-			for(int k = 0; k < network.size(); k++){
-				checkSample[k] = (network.get(k).getState()) ? 1 : 0;
-			}
-			for(int k = 0; k < evidence.size(); k++){
-				int pos = evidence.get(k).nodePos - 1;
-				network.get(pos).setState(currSample[pos]);
-			}
-			boolean accept = sampleCorrectGivenEvidence(evidence, checkSample);
+			
 			if(accept){
-				System.out.print("Accept = [");
 				for(int k = 0; k < network.size(); k++){
-					System.out.print( " " + checkSample[k]);
-				}
-				System.out.print("]");
-				System.out.println();
-				for(int k = 0; k < network.size(); k++){
-					sampleList[sampleCounter][k] = checkSample[k];
+					sampleList[sampleCounter][k] = ((network.get(k).getState()) ? 1 : 0);
 				}
 				sampleCounter++;
 			}else{
 				rejected++;
 			}
 		}
-		
-		System.out.println("Rejected: "+ rejected);
 		
 		double denom = 0;
 		double numer = 0;
